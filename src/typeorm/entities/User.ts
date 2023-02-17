@@ -6,5 +6,5 @@ export class User {
   id: string;
 
   @Column({ unique: true })
-  name: string;
+  username: string;
 }
