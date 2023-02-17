@@ -1,13 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { LobbiesService } from './lobbies.service';
 import { CreateLobbyDto } from './dto/create-lobby.dto';
-import { UpdateLobbyDto } from './dto/update-lobby.dto';
+import { JoinLobbyDto } from './dto/join-lobby.dto';
 
 @Controller('lobbies')
 export class LobbiesController {
   constructor(private readonly lobbiesService: LobbiesService) {}
 
-  @Post()
+  @Post('/create')
   create(@Body() createLobbyDto: CreateLobbyDto) {
     return this.lobbiesService.create(createLobbyDto);
   }
@@ -17,14 +26,9 @@ export class LobbiesController {
     return this.lobbiesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.lobbiesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLobbyDto: UpdateLobbyDto) {
-    return this.lobbiesService.update(+id, updateLobbyDto);
+  @Put('/join')
+  join(@Body() joinLobbyDto: JoinLobbyDto) {
+    return this.lobbiesService.join(joinLobbyDto);
   }
 
   @Delete(':id')

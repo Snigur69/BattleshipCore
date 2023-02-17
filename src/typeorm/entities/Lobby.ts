@@ -17,6 +17,6 @@ export class Lobby {
   @Column()
   status: string;
 
-  @Column()
+  @Column({ nullable: true })
   messages: string;
 }
