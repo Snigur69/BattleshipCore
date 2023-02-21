@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 
 import { CreateLobbyDto } from './dto/create-lobby.dto';
 import { JoinLobbyDto } from './dto/join-lobby.dto';
