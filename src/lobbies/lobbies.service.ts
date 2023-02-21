@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../typeorm/entities/User';
 import { LeaveLobbyDto } from './dto/leave-lobby.dto';
+import { StartLobbyDto } from './dto/start-lobby.dto';
 
 @Injectable()
 export class LobbiesService {
@@ -45,7 +46,7 @@ export class LobbiesService {
     return this.lobbyRepository.save(newLobby);
   }
 
-  findAll() {
+  getAll() {
     return this.lobbyRepository.find(); //TODO: Maybe return only array of ids and names
   }
 
@@ -116,7 +117,25 @@ export class LobbiesService {
     return { message: 'You left the lobby' };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} lobby`;
+  getOne(lobbyId: string) {
+    const lobby = this.lobbyRepository.findOneById(lobbyId);
+
+    if (!lobby) {
+      throw new Error(`Lobby doesn't exist!`);
+    }
+
+    return lobby;
+  }
+
+  async start({ lobbyId }: StartLobbyDto) {
+    const lobby = await this.lobbyRepository.findOneById(lobbyId);
+
+    if (!lobby) {
+      throw new Error(`Lobby doesn't exist!`);
+    }
+
+    await this.lobbyRepository.update({ id: lobbyId }, { status: 'Active' });
+
+    return { ...lobby, status: 'Active' };
   }
 }

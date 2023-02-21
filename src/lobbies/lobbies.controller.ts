@@ -12,6 +12,7 @@ import { LobbiesService } from './lobbies.service';
 import { CreateLobbyDto } from './dto/create-lobby.dto';
 import { JoinLobbyDto } from './dto/join-lobby.dto';
 import { LeaveLobbyDto } from './dto/leave-lobby.dto';
+import { StartLobbyDto } from './dto/start-lobby.dto';
 
 @Controller('lobbies')
 export class LobbiesController {
@@ -23,8 +24,8 @@ export class LobbiesController {
   }
 
   @Get()
-  findAll() {
-    return this.lobbiesService.findAll();
+  getAll() {
+    return this.lobbiesService.getAll();
   }
 
   @Put('/join')
@@ -37,8 +38,13 @@ export class LobbiesController {
     return this.lobbiesService.leave(leaveLobbyDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.lobbiesService.remove(+id);
+  @Get('/:id')
+  getOne(@Param('id') lobbyId: string) {
+    return this.lobbiesService.getOne(lobbyId);
+  }
+
+  @Put('/start')
+  start(@Body() startLobbyDto: StartLobbyDto) {
+    return this.lobbiesService.start(startLobbyDto);
   }
 }
