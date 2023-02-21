@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { LobbiesModule } from './lobbies/lobbies.module';
+import { Lobby } from './typeorm/entities/Lobby';
+import { User } from './typeorm/entities/User';
+import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { LobbiesModule } from './lobbies/lobbies.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './typeorm/entities/User';
-import { Lobby } from './typeorm/entities/Lobby';
 
 @Module({
   imports: [

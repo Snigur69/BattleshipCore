@@ -30,15 +30,10 @@ module.exports = {
       'error',
       {
         groups: [
-          ['^react', '^@?\\w'],
+          ['^@?\\w'],
           ['^@(/.*|$)'],
-          [
-            '^(features/|app/|hooks/|entities/|constants/|utils/|enums/|store/|widgets/)',
-          ],
-          ['^(./model/|model/)'],
           ['^(types/|mocks/|types/)'],
           ['^(shared/)'],
-          ['^assets'],
           ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
           ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
           ['^\\u0000'],

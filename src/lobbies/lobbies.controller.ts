@@ -1,18 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Put,
 } from '@nestjs/common';
-import { LobbiesService } from './lobbies.service';
+
 import { CreateLobbyDto } from './dto/create-lobby.dto';
 import { JoinLobbyDto } from './dto/join-lobby.dto';
 import { LeaveLobbyDto } from './dto/leave-lobby.dto';
 import { StartLobbyDto } from './dto/start-lobby.dto';
+import { LobbiesService } from './lobbies.service';
 
 @Controller('lobbies')
 export class LobbiesController {
