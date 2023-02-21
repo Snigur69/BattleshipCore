@@ -6,6 +6,7 @@ import { Lobby } from '../typeorm/entities/Lobby';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../typeorm/entities/User';
+import { LeaveLobbyDto } from './dto/leave-lobby.dto';
 
 @Injectable()
 export class LobbiesService {
@@ -52,7 +53,7 @@ export class LobbiesService {
     const { username } = await this.userRepository.findOneById(userId);
 
     if (!username) {
-      throw new Error('User does not exist!');
+      throw new Error('User does not exist!'); // TODO: Move to the enum
     }
 
     const lobby = await this.lobbyRepository.findOneById(lobbyId);
@@ -84,12 +85,35 @@ export class LobbiesService {
     };
     const newParticipants = JSON.stringify([...participants, newParticipant]);
 
-    this.lobbyRepository.update(
+    await this.lobbyRepository.update(
       { id: lobbyId },
       { participants: newParticipants },
     );
 
     return { ...lobby, participants: newParticipants };
+  }
+
+  async leave({ lobbyId, userId }: LeaveLobbyDto) {
+    const lobby = await this.lobbyRepository.findOneById(lobbyId);
+
+    if (!lobby) {
+      throw new Error(`Lobby doesn't exist!`);
+    }
+
+    const filteredParticipants = JSON.parse(lobby.participants).filter(
+      (participant) => participant.userId !== userId,
+    );
+
+    if (!filteredParticipants.length) {
+      await this.lobbyRepository.delete(lobbyId);
+    } else {
+      await this.lobbyRepository.update(
+        { id: lobbyId },
+        { participants: JSON.stringify(filteredParticipants) },
+      );
+    }
+
+    return { message: 'You left the lobby' };
   }
 
   remove(id: number) {

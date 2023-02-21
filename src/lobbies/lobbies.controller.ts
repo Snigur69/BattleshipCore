@@ -11,6 +11,7 @@ import {
 import { LobbiesService } from './lobbies.service';
 import { CreateLobbyDto } from './dto/create-lobby.dto';
 import { JoinLobbyDto } from './dto/join-lobby.dto';
+import { LeaveLobbyDto } from './dto/leave-lobby.dto';
 
 @Controller('lobbies')
 export class LobbiesController {
@@ -29,6 +30,11 @@ export class LobbiesController {
   @Put('/join')
   join(@Body() joinLobbyDto: JoinLobbyDto) {
     return this.lobbiesService.join(joinLobbyDto);
+  }
+
+  @Put('/leave')
+  leave(@Body() leaveLobbyDto: LeaveLobbyDto) {
+    return this.lobbiesService.leave(leaveLobbyDto);
   }
 
   @Delete(':id')
