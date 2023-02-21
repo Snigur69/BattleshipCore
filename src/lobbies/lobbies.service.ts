@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { CreateLobbyDto } from './dto/create-lobby.dto';
-import { JoinLobbyDto } from './dto/join-lobby.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Lobby } from '../typeorm/entities/Lobby';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+
+import { LobbyErrors, UserErrors } from '../enums/errors';
+import { LobbyStatuses, Teams } from '../enums/lobby';
+import { UserStatuses } from '../enums/user';
+import { Lobby } from '../typeorm/entities/Lobby';
 import { User } from '../typeorm/entities/User';
+
+import { CreateLobbyDto } from './dto/create-lobby.dto';
+import { JoinLobbyDto } from './dto/join-lobby.dto';
 import { LeaveLobbyDto } from './dto/leave-lobby.dto';
 import { StartLobbyDto } from './dto/start-lobby.dto';
 
@@ -20,7 +25,7 @@ export class LobbiesService {
     const { username } = await this.userRepository.findOneById(userId);
 
     if (!username) {
-      throw new Error('User does not exist!');
+      throw new Error(UserErrors.NotExist);
     }
 
     // TODO: Maybe move it to the separate table (LobbyParticipants)
@@ -29,7 +34,7 @@ export class LobbiesService {
         userId,
         username,
         team,
-        status: 'Unready', //TODO: add to the enum
+        status: UserStatuses.Unready,
         ships: null,
       },
     ]);
@@ -39,7 +44,7 @@ export class LobbiesService {
       name,
       participants,
       createdBy: userId,
-      status: 'Pending', //TODO: move to enum
+      status: LobbyStatuses.Pending,
       messages: null,
     });
 
@@ -54,51 +59,50 @@ export class LobbiesService {
     const { username } = await this.userRepository.findOneById(userId);
 
     if (!username) {
-      throw new Error('User does not exist!'); // TODO: Move to the enum
+      throw new Error(UserErrors.NotExist);
     }
 
     const lobby = await this.lobbyRepository.findOneById(lobbyId);
 
     if (!lobby) {
-      throw new Error('Lobby does not exist!');
+      throw new Error(LobbyErrors.NotExist);
     }
 
     const participants = JSON.parse(lobby.participants);
     const isUserInLobby = participants.find((el) => el.userId === userId);
 
     if (isUserInLobby) {
-      throw new Error('User is already in lobby!');
+      throw new Error(UserErrors.AlreadyInLobby);
     }
 
     if (participants.length === 2) {
-      throw new Error('Lobby is full!');
+      throw new Error(LobbyErrors.LobbyIsFull);
     }
 
     const [userInLobby] = participants;
     const { team } = userInLobby;
-    const availableTeam = team === 'red' ? 'blue' : 'red';
-    const newParticipant = {
+    const availableTeam = team === Teams.Red ? Teams.Blue : Teams.Red;
+    const participant = {
       userId,
       username,
       team: availableTeam,
-      status: 'Unready',
+      status: UserStatuses.Unready,
       ships: null,
     };
-    const newParticipants = JSON.stringify([...participants, newParticipant]);
+    const newParticipants = {
+      participants: JSON.stringify([...participants, participant]),
+    };
 
-    await this.lobbyRepository.update(
-      { id: lobbyId },
-      { participants: newParticipants },
-    );
+    await this.lobbyRepository.update({ id: lobbyId }, newParticipants);
 
-    return { ...lobby, participants: newParticipants };
+    return { ...lobby, ...newParticipants };
   }
 
   async leave({ lobbyId, userId }: LeaveLobbyDto) {
     const lobby = await this.lobbyRepository.findOneById(lobbyId);
 
     if (!lobby) {
-      throw new Error(`Lobby doesn't exist!`);
+      throw new Error(LobbyErrors.NotExist);
     }
 
     const filteredParticipants = JSON.parse(lobby.participants).filter(
@@ -121,7 +125,7 @@ export class LobbiesService {
     const lobby = this.lobbyRepository.findOneById(lobbyId);
 
     if (!lobby) {
-      throw new Error(`Lobby doesn't exist!`);
+      throw new Error(LobbyErrors.NotExist);
     }
 
     return lobby;
@@ -131,11 +135,13 @@ export class LobbiesService {
     const lobby = await this.lobbyRepository.findOneById(lobbyId);
 
     if (!lobby) {
-      throw new Error(`Lobby doesn't exist!`);
+      throw new Error(LobbyErrors.NotExist);
     }
 
-    await this.lobbyRepository.update({ id: lobbyId }, { status: 'Active' });
+    const newStatus = { status: LobbyStatuses.Active };
 
-    return { ...lobby, status: 'Active' };
+    await this.lobbyRepository.update({ id: lobbyId }, newStatus);
+
+    return { ...lobby, ...newStatus };
   }
 }

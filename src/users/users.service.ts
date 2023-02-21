@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../typeorm/entities/User';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+
+import { UserErrors } from '../enums/errors';
+import { User } from '../typeorm/entities/User';
+
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +20,13 @@ export class UsersService {
     return this.userRepository.save(newUser);
   }
 
-  findOne(id: string) {
-    return this.userRepository.findOneById(id);
+  async findOne(id: string) {
+    const user = await this.userRepository.findOneById(id);
+
+    if (!user) {
+      throw new Error(UserErrors.NotExist);
+    }
+
+    return user;
   }
 }
