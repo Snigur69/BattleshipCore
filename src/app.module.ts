@@ -5,6 +5,7 @@ import { LobbiesModule } from './lobbies/lobbies.module';
 import { Lobby } from './typeorm/entities/Lobby';
 import { User } from './typeorm/entities/User';
 import { UsersModule } from './users/users.module';
+import { EventsModule } from './websockets/events.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -12,6 +13,7 @@ import { AppService } from './app.service';
   imports: [
     UsersModule,
     LobbiesModule,
+    EventsModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',

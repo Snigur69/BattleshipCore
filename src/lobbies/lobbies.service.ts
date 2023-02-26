@@ -48,7 +48,9 @@ export class LobbiesService {
       messages: null,
     });
 
-    return this.lobbyRepository.save(newLobby);
+    await this.lobbyRepository.save(newLobby);
+
+    return { ...newLobby, participants: JSON.parse(newLobby.participants) };
   }
 
   getAll() {
@@ -89,13 +91,16 @@ export class LobbiesService {
       status: UserStatuses.Unready,
       ships: null,
     };
-    const newParticipants = {
-      participants: JSON.stringify([...participants, participant]),
-    };
+    const newParticipants = [...participants, participant];
 
-    await this.lobbyRepository.update({ id: lobbyId }, newParticipants);
+    await this.lobbyRepository.update(
+      { id: lobbyId },
+      {
+        participants: JSON.stringify(newParticipants),
+      },
+    );
 
-    return { ...lobby, ...newParticipants };
+    return { ...lobby, participants: newParticipants };
   }
 
   async leave({ lobbyId, userId }: LeaveLobbyDto) {
@@ -121,14 +126,14 @@ export class LobbiesService {
     return { message: 'You left the lobby' };
   }
 
-  getOne(lobbyId: string) {
-    const lobby = this.lobbyRepository.findOneById(lobbyId);
+  async getOne(lobbyId: string) {
+    const lobby = await this.lobbyRepository.findOneById(lobbyId);
 
     if (!lobby) {
       throw new Error(LobbyErrors.NotExist);
     }
 
-    return lobby;
+    return { ...lobby, participants: JSON.parse(lobby.participants) };
   }
 
   async start({ lobbyId }: StartLobbyDto) {
@@ -142,6 +147,10 @@ export class LobbiesService {
 
     await this.lobbyRepository.update({ id: lobbyId }, newStatus);
 
-    return { ...lobby, ...newStatus };
+    return {
+      ...lobby,
+      ...newStatus,
+      participants: JSON.parse(lobby.participants),
+    };
   }
 }
